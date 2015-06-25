@@ -111,8 +111,10 @@ OSCMessage.prototype.parse = function (data)
 };
 
 /* Takes an array of byte arrays. */
-OSCMessage.prototype.buildBundle = function (messages)
+OSCMessage.prototype.buildBundle = function (messages, prepend_length)
 {
+    if(typeof prepend_length === undefined){var prepend_length = false;}
+
     this.data = [].concat (OSCMessage.BUNDLE_HEADER);
     while (msg = messages.shift ())
     {
