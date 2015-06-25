@@ -111,15 +111,39 @@ OSCMessage.prototype.parse = function (data)
 };
 
 /* Takes an array of byte arrays. */
-OSCMessage.prototype.buildBundle = function (messages)
+OSCMessage.prototype.buildBundle = function (messages, prepend_length)
 {
+    if(typeof prepend_length === undefined){var prepend_length = false;}
+
     this.data = [].concat (OSCMessage.BUNDLE_HEADER);
+
+    var length_header = [];
+
     while (msg = messages.shift ())
     {
         this.writeInteger (msg.length);
         this.data = this.data.concat (msg);
     }
-    return this.data;
+
+    if(prepend_length == true)
+    {
+	var pos = 0
+
+	var length_header = [ 0, 0, 0, 0];
+
+	var length = this.data.length;
+
+	for (var i = 0; i < 4; i++)
+	{
+	    length_header[pos + 3 - i] = length & 255;
+
+	    if (length_header[pos + 3 - i] >= 128)
+		length_header[pos + 3 - i] = length_header[pos + 3 - i] - 256;
+	    length = length >> 8;
+	}
+    }
+
+    return length_header.concat(this.data);
 };
 
 OSCMessage.prototype.build = function ()
