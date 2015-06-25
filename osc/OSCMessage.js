@@ -146,8 +146,10 @@ OSCMessage.prototype.buildBundle = function (messages, prepend_length)
     return length_header.concat(this.data);
 };
 
-OSCMessage.prototype.build = function ()
+OSCMessage.prototype.build = function (prepend_length)
 {
+    if(typeof prepend_length === undefined){var prepend_length = false;}
+
     this.data = [];
 
     this.writeString (this.address);
