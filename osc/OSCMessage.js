@@ -150,6 +150,8 @@ OSCMessage.prototype.build = function (prepend_length)
 {
     if(typeof prepend_length === undefined){var prepend_length = false;}
 
+    var length_header = [];
+
     this.data = [];
 
     this.writeString (this.address);
@@ -187,7 +189,25 @@ OSCMessage.prototype.build = function (prepend_length)
         this.alignToFourByteBoundary ();
     }
     
-    return this.data;
+    if(prepend_length == true)
+    {
+	var pos = 0
+
+	var length_header = [ 0, 0, 0, 0];
+
+	var length = this.data.length;
+
+	for (var i = 0; i < 4; i++)
+	{
+	    length_header[pos + 3 - i] = length & 255;
+
+	    if (length_header[pos + 3 - i] >= 128)
+		length_header[pos + 3 - i] = length_header[pos + 3 - i] - 256;
+	    length = length >> 8;
+	}
+    }
+
+    return length_header.concat(this.data);
 };
 
 
